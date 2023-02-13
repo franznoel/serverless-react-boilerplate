@@ -2,6 +2,18 @@
 
 Fintech Store by Franz
 
+## Getting Started
+
+Run the following commands to run locally
+```bash
+> npm ci
+> npm run install:sls-dynamodb
+> npm start -- --stage dev
+```
+
+To access the UI, go to http://localhost:3000/
+To access the API, go to http://localhost:3000/api
+
 ## Task:
 * Recreate this computer store app.  We will go over your submission during the next phase of the interview so be prepared to answer questions about your solution.
 * We encourage the use of libraries and frameworks as much as you want to save time.

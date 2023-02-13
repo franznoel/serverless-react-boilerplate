@@ -39,6 +39,7 @@ provider:
 plugins:
   - serverless-webpack
   - serverless-plugin-scripts
+  - serverless-dynamodb-local
   - serverless-offline
   - serverless-s3-deploy
 
@@ -109,6 +110,23 @@ custom:
     httpPort: 3000
     lambdaPort: 3002
 
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    seed:
+      domain:
+        sources:
+          - table: productsTable
+            sources: [./products.json]
+
 resources:
   Resources:
     # Customize the API Gateway resource
@@ -138,6 +156,36 @@ resources:
                       - Ref: AWS::Region
                       - .amazonaws.com
               MaxAge: 3000
+
+    productsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: productsTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+          - AttributeName: title
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: title
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: ProductTitleIndex
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+              - AttributeName: title
+                KeyType: RANGE
+            Projection:
+              ProjectionType: 'ALL'
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
   Outputs:
     ApiGatewayRestApi:

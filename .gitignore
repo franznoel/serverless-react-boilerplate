@@ -12,3 +12,6 @@ dist
 
 # Other
 .DS_Store
+
+# Local DynamoDB
+.dynamodb

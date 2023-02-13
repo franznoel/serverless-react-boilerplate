@@ -9,6 +9,7 @@
     "build:serverless": "sls package",
     "build:browser": "webpack --config webpack.browser.config.js --mode production",
     "deploy": "sls deploy",
+    "install:sls-dynamodb": "sls dynamodb install",
     "test": "jest"
   },
   "dependencies": {
@@ -59,6 +60,7 @@
     "prettier": "^2.2.1",
     "react-refresh": "^0.10.0",
     "serverless": "^3.14.0",
+    "serverless-dynamodb-local": "0.2.40",
     "serverless-offline": "~8.5.0",
     "serverless-plugin-scripts": "^1.0.2",
     "serverless-s3-deploy": "^0.10.0",
