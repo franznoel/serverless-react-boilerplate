@@ -55,6 +55,13 @@ functions:
           path: /{any+}
           method: any
           cors: true
+  api:
+    handler: api.serve
+    events:
+      - http:
+          path: /api/
+          method: any
+          cors: true
 
 custom:
   distBucketUrl:
