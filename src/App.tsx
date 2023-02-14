@@ -31,7 +31,8 @@ export default function App() {
   const [startId, setStartId] = useState('');
 
   const getProducts = useCallback(async (search: string, lastId: string) => {
-    fetch(`http://localhost:3000/api?search=${search}&startKey=${lastId}`, {
+    const apiUrl = config.app.URL;
+    fetch(`${apiUrl}/api?search=${search}&startKey=${lastId}`, {
         headers: {
           "Content-Type": "application/json"
         },
