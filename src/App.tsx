@@ -1,6 +1,6 @@
 import "./App.css";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 
 import useConfig from "./components/useConfig";
 import { LocalShipping, Redeem } from "@mui/icons-material";
@@ -27,27 +27,46 @@ export default function App() {
   const [numberOfProducts, setNumberOfProducts] = useState(0);
   const [productTotal, setProductTotal] = useState(0);
   const debouncedSearchTerm = useDebounce(searchTerm, 250);
+  const [lastEvaluatedId, setLastEvaluatedId] = useState('');
+  const [startId, setStartId] = useState('');
 
-  useEffect(() => {
-    const getProducts = async (search: string) => fetch(`http://localhost:3000/api?search=${search}`, {
-      headers: {
-        "Content-Type": "application/json"
-      },
-      mode: 'cors'
-    })
+  const getProducts = useCallback(async (search: string, lastId: string) => {
+    fetch(`http://localhost:3000/api?search=${search}&startKey=${lastId}`, {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        mode: 'cors'
+      })
       .then((response) => response.json())
-      .then(({ products, limit, total }) => {
-        setNumberOfProducts(limit);
-        setProductTotal(productTotal);
-        setProducts(products);
+      .then(({ products, limit, total, lastEvaluatedKey }) => {
+        setNumberOfProducts((numberOfProducts) => numberOfProducts += limit);
+        setProductTotal(total);
+        setProducts((productsArr) => productsArr.concat(products));
+        setLastEvaluatedId(lastEvaluatedKey.id);
       })
       .catch((error) => console.error(error));
-    getProducts(debouncedSearchTerm);
-  }, [setProducts, setNumberOfProducts, setProductTotal, debouncedSearchTerm]);
+  }, [setProducts, setNumberOfProducts, setProductTotal]);
+
+  useEffect(() => {
+    getProducts(debouncedSearchTerm, startId);
+  }, [getProducts, debouncedSearchTerm]);
 
   const displayProduct = () => {
     console.log('Product');
   }
+
+  const getMoreProducts = useCallback(() => {
+    if (lastEvaluatedId !== startId) {
+      setStartId(lastEvaluatedId);
+    }
+  }, [setStartId, lastEvaluatedId]);
+
+  useEffect(() => {
+    console.log('lastEvaluatedId, startId', lastEvaluatedId, startId);
+    if (lastEvaluatedId === startId) {
+      getProducts(debouncedSearchTerm, startId);
+    }
+  }, [lastEvaluatedId, startId])
 
   return (
     <div className="App">
@@ -56,10 +75,10 @@ export default function App() {
       </div>
       <div className="App-content">
         <h1 className="results">Results</h1>
-        <p>Showing {numberOfProducts} of 100</p>
+        <p>Showing {numberOfProducts} of {productTotal}</p>
       </div>
       <div className="App-products">
-        {products && products.map((product: Product) => {
+        {products && products.map((product: Product, index: number) => {
           return (
             <div className="product" key={`product-${product.id}`}>
               <div className="image-container">
@@ -87,7 +106,7 @@ export default function App() {
         })}
       </div>
       <div className="load-more">
-        <span>Show more</span>
+        <span onClick={(e) => getMoreProducts()}>Show more</span>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import { Key, ScanInput } from 'aws-sdk/clients/dynamodb';
 
 
 const PRODUCT_TABLE_NAME = 'productsTable';
@@ -10,24 +11,8 @@ const dynamoClient = new AWS.DynamoDB.DocumentClient({
   secretAccessKey: 'DEFAULT_SECRET' // needed if you don't have aws credentials at all in env
 });
 
-export const getProducts = async () => {
-  const products = await dynamoClient.scan({
-    TableName : PRODUCT_TABLE_NAME,
-    Limit: 12
-  }).promise();
-  return products;
-}
-
-export const getTotalProducts = async () => {
-  const totalProducts = await dynamoClient.scan({
-    TableName : PRODUCT_TABLE_NAME,
-    Select: 'COUNT',
-  }).promise();
-  return totalProducts;
-}
-
-export const getSearchedProducts = async(searchTerm: string) => {
-  const products = await dynamoClient.scan({
+export const getSearchedProducts = async(searchTerm: string, startKey: number) => {
+  let params = {
     TableName : PRODUCT_TABLE_NAME,
     Select: "ALL_ATTRIBUTES",
     FilterExpression: "contains(#title,:searchTerm) OR #brandName = :searchTerm",
@@ -38,13 +23,19 @@ export const getSearchedProducts = async(searchTerm: string) => {
     ExpressionAttributeValues: {
       ":searchTerm": searchTerm,
     },
-    Limit: 12
-  }).promise();
+    Limit: 12,
+  } as ScanInput;
+
+  if (startKey) {
+    params.ExclusiveStartKey = { id: startKey } as Key;
+  }
+
+  const products = await dynamoClient.scan(params).promise();
   return products;
 }
 
-export const getTotalSearchedProducts = async(searchTerm: string) => {
-  const totalSearchedProducts = await dynamoClient.scan({
+export const getTotalSearchedProducts = async(searchTerm: string, startKey: number) => {
+  let params = {
     TableName : PRODUCT_TABLE_NAME,
     Select: 'COUNT',
     FilterExpression: 'contains(#title,:searchTerm) OR #brandName = :searchTerm',
@@ -55,6 +46,8 @@ export const getTotalSearchedProducts = async(searchTerm: string) => {
     ExpressionAttributeValues: {
       ":searchTerm": searchTerm
     }
-  }).promise();
+  } as ScanInput;
+
+  const totalSearchedProducts = await dynamoClient.scan(params).promise();
   return totalSearchedProducts;
 }

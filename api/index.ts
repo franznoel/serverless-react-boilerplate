@@ -1,16 +1,18 @@
 import "source-map-support/register";
 import { Context, APIGatewayEvent, APIGatewayProxyResultV2 } from "aws-lambda";
-import { getProducts, getSearchedProducts, getTotalProducts, getTotalSearchedProducts } from "./ProductModel";
+import { getSearchedProducts, getTotalSearchedProducts } from "./ProductModel";
 
 interface iProductsSearch {
   search: string
+  startKey: string
 }
 
 export const serve = async (event: APIGatewayEvent, _context: Context): Promise<APIGatewayProxyResultV2> => {
   try {
-    const { search  } = event.queryStringParameters as unknown as iProductsSearch;
-    const totalProducts = search ? await getTotalSearchedProducts(search) : await getTotalProducts();
-    const products = search ? await getSearchedProducts(search) : await getProducts();
+    const { search, startKey } = event.queryStringParameters as unknown as iProductsSearch;
+    const id = Number(startKey);
+    const products = await getSearchedProducts(search, id);
+    const totalProducts = await getTotalSearchedProducts(search, id);
 
     return {
       statusCode: 200,
@@ -21,7 +23,8 @@ export const serve = async (event: APIGatewayEvent, _context: Context): Promise<
       body: JSON.stringify({
         products: products.Items || [],
         limit: products.Count || 0,
-        total: totalProducts.Count || 0
+        total: totalProducts.Count || 0,
+        lastEvaluatedKey: products.LastEvaluatedKey
       }),
     };
   } catch (error) {
