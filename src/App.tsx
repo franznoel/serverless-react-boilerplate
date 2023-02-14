@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import useConfig from "./components/useConfig";
 import { LocalShipping, Redeem } from "@mui/icons-material";
+import { useDebounce } from "./hooks/debounce";
 
 interface Product {
   id: number
@@ -21,13 +22,14 @@ interface Product {
  */
 export default function App() {
   const config = useConfig();
-  const [searchText, setSearchText] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [products, setProducts] = useState([]);
   const [numberOfProducts, setNumberOfProducts] = useState(0);
   const [productTotal, setProductTotal] = useState(0);
+  const debouncedSearchTerm = useDebounce(searchTerm, 250);
 
   useEffect(() => {
-    const getProducts = async () => fetch('http://localhost:3000/api', {
+    const getProducts = async (search: string) => fetch(`http://localhost:3000/api?search=${search}`, {
       headers: {
         "Content-Type": "application/json"
       },
@@ -40,21 +42,17 @@ export default function App() {
         setProducts(products);
       })
       .catch((error) => console.error(error));
-    getProducts();
-  }, [setProducts]);
-
-  useEffect(() => {
-    console.log('products', products);
-  }, [products])
+    getProducts(debouncedSearchTerm);
+  }, [setProducts, setNumberOfProducts, setProductTotal, debouncedSearchTerm]);
 
   const displayProduct = () => {
-    console.log('Product')
+    console.log('Product');
   }
 
   return (
     <div className="App">
       <div className="App-header">
-        <input type="text" placeholder="Search" className="App-search-input" />
+        <input type="text" placeholder="Search" className="App-search-input" onChange={(e) => setSearchTerm(e.target.value)} value={searchTerm} />
       </div>
       <div className="App-content">
         <h1 className="results">Results</h1>

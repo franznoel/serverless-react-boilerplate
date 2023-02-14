@@ -164,25 +164,9 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: N
-          - AttributeName: title
-            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-          - AttributeName: title
-            KeyType: RANGE
-        GlobalSecondaryIndexes:
-          - IndexName: ProductTitleIndex
-            KeySchema:
-              - AttributeName: id
-                KeyType: HASH
-              - AttributeName: title
-                KeyType: RANGE
-            Projection:
-              ProjectionType: 'ALL'
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

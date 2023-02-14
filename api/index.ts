@@ -1,12 +1,16 @@
 import "source-map-support/register";
 import { Context, APIGatewayEvent, APIGatewayProxyResultV2 } from "aws-lambda";
-import { getProducts, getTotalProducts } from "./ProductModel";
+import { getProducts, getSearchedProducts, getTotalProducts, getTotalSearchedProducts } from "./ProductModel";
 
+interface iProductsSearch {
+  search: string
+}
 
 export const serve = async (event: APIGatewayEvent, _context: Context): Promise<APIGatewayProxyResultV2> => {
   try {
-    const totalProducts = await getTotalProducts();
-    const products = await getProducts();
+    const { search  } = event.queryStringParameters as unknown as iProductsSearch;
+    const totalProducts = search ? await getTotalSearchedProducts(search) : await getTotalProducts();
+    const products = search ? await getSearchedProducts(search) : await getProducts();
 
     return {
       statusCode: 200,
@@ -28,7 +32,7 @@ export const serve = async (event: APIGatewayEvent, _context: Context): Promise<
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
       },
-      body: JSON.stringify({ message: 'Failed to load the server'})
+      body: JSON.stringify({ message: error.message })
     }
   }
 };

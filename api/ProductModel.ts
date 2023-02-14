@@ -13,9 +13,8 @@ const dynamoClient = new AWS.DynamoDB.DocumentClient({
 export const getProducts = async () => {
   const products = await dynamoClient.scan({
     TableName : PRODUCT_TABLE_NAME,
-    Limit: 12,
+    Limit: 12
   }).promise();
-  console.log('products', products);
   return products;
 }
 
@@ -24,6 +23,38 @@ export const getTotalProducts = async () => {
     TableName : PRODUCT_TABLE_NAME,
     Select: 'COUNT',
   }).promise();
-  console.log('totalProducts', totalProducts);
   return totalProducts;
+}
+
+export const getSearchedProducts = async(searchTerm: string) => {
+  const products = await dynamoClient.scan({
+    TableName : PRODUCT_TABLE_NAME,
+    Select: "ALL_ATTRIBUTES",
+    FilterExpression: "contains(#title,:searchTerm) OR #brandName = :searchTerm",
+    ExpressionAttributeNames: {
+      "#title": "title",
+      "#brandName": "brandName"
+    },
+    ExpressionAttributeValues: {
+      ":searchTerm": searchTerm,
+    },
+    Limit: 12
+  }).promise();
+  return products;
+}
+
+export const getTotalSearchedProducts = async(searchTerm: string) => {
+  const totalSearchedProducts = await dynamoClient.scan({
+    TableName : PRODUCT_TABLE_NAME,
+    Select: 'COUNT',
+    FilterExpression: 'contains(#title,:searchTerm) OR #brandName = :searchTerm',
+    ExpressionAttributeNames: {
+      "#title": "title",
+      "#brandName": "brandName"
+    },
+    ExpressionAttributeValues: {
+      ":searchTerm": searchTerm
+    }
+  }).promise();
+  return totalSearchedProducts;
 }
