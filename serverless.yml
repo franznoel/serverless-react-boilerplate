@@ -57,7 +57,7 @@ functions:
           method: any
           cors: true
   api:
-    handler: api.serve
+    handler: api/index.serve
     events:
       - http:
           path: /api/

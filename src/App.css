@@ -136,6 +136,10 @@
   cursor: pointer;
 }
 
+.App-products .product .product-summary button.view-deal:hover {
+  opacity: 0.7;
+}
+
 .load-more {
   width: 1200px;
   text-align: center;

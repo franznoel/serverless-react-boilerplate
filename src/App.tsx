@@ -21,7 +21,10 @@ interface Product {
  */
 export default function App() {
   const config = useConfig();
+  const [searchText, setSearchText] = useState('');
   const [products, setProducts] = useState([]);
+  const [numberOfProducts, setNumberOfProducts] = useState(0);
+  const [productTotal, setProductTotal] = useState(0);
 
   useEffect(() => {
     const getProducts = async () => fetch('http://localhost:3000/api', {
@@ -31,7 +34,9 @@ export default function App() {
       mode: 'cors'
     })
       .then((response) => response.json())
-      .then(({ products }) => {
+      .then(({ products, limit, total }) => {
+        setNumberOfProducts(limit);
+        setProductTotal(productTotal);
         setProducts(products);
       })
       .catch((error) => console.error(error));
@@ -53,7 +58,7 @@ export default function App() {
       </div>
       <div className="App-content">
         <h1 className="results">Results</h1>
-        <p>Showing 12 of 100</p>
+        <p>Showing {numberOfProducts} of 100</p>
       </div>
       <div className="App-products">
         {products && products.map((product: Product) => {
