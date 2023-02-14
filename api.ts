@@ -19,6 +19,10 @@ export const serve = async (event: APIGatewayEvent, _context: Context): Promise<
 
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify({
       products: products.Items,
       lastEvaluatedKey: products.LastEvaluatedKey

@@ -1,26 +1,151 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+  text-align: left;
+  height: 100%;
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
+  background-color: #fff;
+  height: 50px;
   padding: 20px;
-  color: white;
+  text-align: center;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .App-title {
   font-size: 1.5em;
 }
 
-.App-intro {
-  font-size: large;
+.App-search-input {
+  width: 1200px;
+  border: 0;
+  border-radius: 50px;
+  background-color: #efefef;
+  padding: 10px;
 }
+
+.App-content {
+  width: 1200px;
+  font-size: large;
+  margin: 0 auto;
+}
+
+.App-content h1 {
+  margin: 10px 0;
+}
+
+.App-content p {
+  color: #898989;
+  text-shadow: 0 2px 5px #aeaeae;
+  font-size: 10px;
+}
+
+.App-products {
+  width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.App-products .product {
+  flex: 1 0 21%;
+  margin: 10px;
+  padding: 10px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1), 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+}
+
+.App-products .product .image-container {
+  width: 100%;
+  text-align: center;
+}
+
+.App-products .product .product-summary {
+  width: 100%;
+  text-align: left;
+}
+
+.App-products .product .product-summary .brand-name {
+  font-size: 12px;
+}
+
+.App-products .product .product-summary .title {
+  font-size: 12px;
+  min-height: 30px;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+  min-height: 50px;
+  overflow: hidden;
+  color: #363636;
+}
+
+.App-products .product .product-summary .price-container {
+  font-size: 12px;
+  margin: 5px 0;
+}
+
+.App-products .product .product-summary .price-container .price {
+  color: #FF6669;
+  margin-right: 5px;
+}
+
+.App-products .product .product-summary .price-container .price-before {
+  color: #9C9C9C;
+  text-decoration: line-through;
+}
+
+.App-products .product .product-summary .freebie-container {
+  display: flex;
+  height: 10px;
+  font-size: 10px;
+  margin: 5px 0 30px 0;
+  padding-top: 5px;
+  border-top: 1px solid #E8E8E8;
+  color: #aeaeae;
+}
+
+.App-products .product .product-summary .freebie-container div {
+  display: flex;
+  vertical-align: top;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 5px 0 0;
+}
+
+.App-products .product .product-summary .freebie-container span {
+  height: 12px;
+  vertical-align: middle;
+  margin: 0;
+}
+
+.App-products .product .product-summary .freebie-container span .icon {
+  color: #aeaeae;
+}
+
+.App-products .product .product-summary .freebie-container span:first-child {
+  margin: 0 5px 0 0;
+}
+
+.App-products .product .product-summary button.view-deal {
+  width: 100%;
+  background-color: #1AB76C;
+  color: #ffffff;
+  border-radius: 38px;
+  border: 0;
+  padding: 10px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.load-more {
+  width: 1200px;
+  text-align: center;
+  margin: 20px auto;
+}
+.load-more span {
+  color: #1AB76C;
+  cursor: pointer;
+}
+
 
 @keyframes App-logo-spin {
   from {
