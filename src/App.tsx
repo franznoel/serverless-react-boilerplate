@@ -23,7 +23,7 @@ interface Product {
 export default function App() {
   const config = useConfig();
   const [searchTerm, setSearchTerm] = useState('');
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [numberOfProducts, setNumberOfProducts] = useState(0);
   const [productTotal, setProductTotal] = useState(0);
   const debouncedSearchTerm = useDebounce(searchTerm, 250);
@@ -39,9 +39,20 @@ export default function App() {
       })
       .then((response) => response.json())
       .then(({ products, limit, total, lastEvaluatedKey }) => {
-        setNumberOfProducts((numberOfProducts) => numberOfProducts += limit);
+        let existingProductsSize = 0;
         setProductTotal(total);
-        setProducts((productsArr) => productsArr.concat(products));
+        setProducts((existingProducts: Product[]) => {
+          // TODO: existingProducts.concat(product) if existingProducts.id not in product.id;
+          const existingProductIds = existingProducts.map((existingProduct) => existingProduct.id);
+          for (const product of products) {
+            if (!existingProductIds.includes(product.id)) {
+              existingProducts.push(product);
+            }
+          }
+          existingProductsSize = existingProducts.length;
+          return existingProducts;
+        });
+        setNumberOfProducts(existingProductsSize);
         setLastEvaluatedId(lastEvaluatedKey.id);
       })
       .catch((error) => console.error(error));
@@ -62,7 +73,6 @@ export default function App() {
   }, [setStartId, lastEvaluatedId]);
 
   useEffect(() => {
-    console.log('lastEvaluatedId, startId', lastEvaluatedId, startId);
     if (lastEvaluatedId === startId) {
       getProducts(debouncedSearchTerm, startId);
     }
@@ -105,9 +115,11 @@ export default function App() {
           );
         })}
       </div>
-      <div className="load-more">
-        <span onClick={(e) => getMoreProducts()}>Show more</span>
-      </div>
+      {numberOfProducts !== productTotal && (
+        <div className="load-more">
+          <span onClick={(e) => getMoreProducts()}>Show more</span>
+        </div>
+      )}
     </div>
   );
 }

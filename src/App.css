@@ -146,10 +146,13 @@
   margin: 20px auto;
 }
 .load-more span {
+  opacity: 0.7;
   color: #1AB76C;
   cursor: pointer;
 }
-
+.load-more span:hover {
+  opacity: 1;
+}
 
 @keyframes App-logo-spin {
   from {
