@@ -45,7 +45,7 @@ export default function App() {
         mode: 'cors'
       })
       .then((response) => response.json())
-      .then(({ products, limit, total, lastEvaluatedKey }) => {
+      .then(({ products, total, lastEvaluatedKey }) => {
         let existingProductsSize = 0;
         setProductTotal(total);
         setProducts((existingProducts: Product[]) => {
@@ -66,12 +66,37 @@ export default function App() {
       .catch((error) => console.error(error));
   }, [setProducts, setNumberOfProducts, setProductTotal]);
 
-  useEffect(() => {
-    getProducts(startId);
-  }, [getProducts, startId]);
+  const searchProducts = useCallback(async (search: string) => {
+      setIsLoading(true);
+      const apiUrl = config.app.URL;
+      fetch(`${apiUrl}/products/search?search=${search}`, {
+          headers: {
+            "Content-Type": "application/json"
+          },
+          mode: 'cors'
+        })
+        .then((response) => response.json())
+        .then(({ products, total }) => {
+          setProductTotal(total);
+          setProducts(products);
+          setNumberOfProducts(products.length);
+          setIsLoading(false);
+          setLastEvaluatedId('');
+        })
+        .catch((error) => console.error(error));
+  }, [setProducts, setNumberOfProducts, setProductTotal])
 
   useEffect(() => {
-    console.log('debouncedSearchTerm', debouncedSearchTerm);
+    if (debouncedSearchTerm === '') {
+      getProducts(startId);
+    }
+  }, [getProducts, startId, debouncedSearchTerm]);
+
+  useEffect(() => {
+    if (debouncedSearchTerm !== '') {
+      setProducts([]);
+      searchProducts(searchTerm);
+    }
   }, [debouncedSearchTerm])
 
   const displayProduct = () => {
@@ -125,7 +150,7 @@ export default function App() {
             </div>
         ))}
       </div>
-      {numberOfProducts !== productTotal && (
+      {debouncedSearchTerm === '' && numberOfProducts !== productTotal && (
         <div className="load-more">
           {isLoadingMoreProducts && (
               <div style={{ width: '100%' }}>
