@@ -30,9 +30,9 @@ export default function App() {
   const [lastEvaluatedId, setLastEvaluatedId] = useState('');
   const [startId, setStartId] = useState('');
 
-  const getProducts = useCallback(async (search: string, lastId: string) => {
+  const getProducts = useCallback(async (lastId: string) => {
     const apiUrl = config.app.URL;
-    fetch(`${apiUrl}/api?search=${search}&startKey=${lastId}`, {
+    fetch(`${apiUrl}/products?startKey=${lastId}`, {
         headers: {
           "Content-Type": "application/json"
         },
@@ -60,7 +60,7 @@ export default function App() {
   }, [setProducts, setNumberOfProducts, setProductTotal]);
 
   useEffect(() => {
-    getProducts(debouncedSearchTerm, startId);
+    getProducts(startId);
   }, [getProducts, debouncedSearchTerm]);
 
   const displayProduct = () => {
@@ -75,7 +75,7 @@ export default function App() {
 
   useEffect(() => {
     if (lastEvaluatedId === startId) {
-      getProducts(debouncedSearchTerm, startId);
+      getProducts(startId);
     }
   }, [lastEvaluatedId, startId])
 

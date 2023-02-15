@@ -52,11 +52,11 @@ functions:
           path: /
           method: GET
           cors: true
-  api:
-    handler: api/index.serve
+  products:
+    handler: api/products.serve
     events:
       - http:
-          path: /api/
+          path: /products/
           method: GET
           cors: true
     iamRoleStatementsInherit: true
@@ -67,9 +67,22 @@ functions:
           - dynamodb:GetItem
           - dynamodb:Query
           - dynamodb:Scan
-          - dynamodb:BatchWriteItem
-          - dynamodb:PutItem
-          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:*:*:table/productsTable
+  productsSearch:
+    handler: api/products.search
+    events:
+      - http:
+          path: /products/search
+          method: GET
+          cors: true
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:BatchGetItem
+          - dynamodb:GetItem
+          - dynamodb:Query
+          - dynamodb:Scan
         Resource: arn:aws:dynamodb:*:*:table/productsTable
 
 custom:

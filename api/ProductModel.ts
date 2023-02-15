@@ -11,7 +11,32 @@ const dynamoClient = new AWS.DynamoDB.DocumentClient({
   sessionToken: process.env.AWS_SESSION_TOKEN,
 });
 
-export const getSearchedProducts = async(searchTerm: string, startKey: number) => {
+export const getProducts = async(startKey: number) => {
+  let params = {
+    TableName : PRODUCT_TABLE_NAME,
+    Select: "ALL_ATTRIBUTES",
+    Limit: 12
+  } as ScanInput;
+
+  if (startKey) {
+    params.ExclusiveStartKey = { id: startKey } as Key;
+  }
+
+  const products = await dynamoClient.scan(params).promise();
+  return products;
+}
+
+export const getTotalProducts = async(startKey: number) => {
+  let params = {
+    TableName : PRODUCT_TABLE_NAME,
+    Select: 'COUNT',
+  } as ScanInput;
+
+  const totalSearchedProducts = await dynamoClient.scan(params).promise();
+  return totalSearchedProducts;
+}
+
+export const searchProducts = async(searchTerm: string) => {
   let params = {
     TableName : PRODUCT_TABLE_NAME,
     Select: "ALL_ATTRIBUTES",
@@ -23,19 +48,13 @@ export const getSearchedProducts = async(searchTerm: string, startKey: number) =
     ExpressionAttributeValues: {
       ":searchTerm": searchTerm,
     },
-    Limit: 12,
   } as ScanInput;
-
-  if (startKey) {
-    params.ExclusiveStartKey = { id: startKey } as Key;
-    params.Limit = 12
-  }
 
   const products = await dynamoClient.scan(params).promise();
   return products;
 }
 
-export const getTotalSearchedProducts = async(searchTerm: string, startKey: number) => {
+export const totalSearchProducts = async(searchTerm: string) => {
   let params = {
     TableName : PRODUCT_TABLE_NAME,
     Select: 'COUNT',
