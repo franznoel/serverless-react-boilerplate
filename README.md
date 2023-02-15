@@ -1,56 +1,105 @@
-# FinTech Store
+# Serverless React Boiler Plate
 
-Fintech Store by Franz
+This is an Store application written in React and Nodejs adapted from the Serverless React Boiler Plate, and using Serverless Framework.
 
-## Getting Started
+Here is the sample application deployed in AWS.
+https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/
 
-Run the following commands to run locally
+### Functionality:
+The application has the following features:
+* Search products
+* Load 12 products and show more products when the "Show More" button is clicked.
+
+### Features in Detail:
+* Debounce for 250ms before sending the request to the server.
+* If there is a search term, it will use the searched keyword to list the products and will not show the "Show More" button
+* If there is no search term, it will load 12 products as the limit, and "Show More" button is displayed.
+
+## Getting Started Development
+
+To contribute as a developer, run the following commands locally
 ```bash
+# Clean Install
 > npm ci
+
+# Install and seed the DynamoDB
 > npm run install:sls-dynamodb
-> npm start -- --stage dev
+
+# Start development environment
+> npm start
 ```
 
-To access the UI, go to http://localhost:3000/
-To access the API, go to http://localhost:3000/api
+Here are the URLs available:
+* http://localhost:3000/ - the user interface
+* http://localhost:3000/products?startKey= - the API for the products
+* http://localhost:3000/products/search?search= - the API for the product search
 
-## Task:
-* Recreate this computer store app.  We will go over your submission during the next phase of the interview so be prepared to answer questions about your solution.
-* We encourage the use of libraries and frameworks as much as you want to save time.
+## Technology Used
 
-## Frontend Requirements:
-* You must write this in a modern framework.  Your choices are: React, Angular, or Vue.js
-* Match this style as close as possible.
-* Search Bar:
-  * 250ms debounce on keydown to query backend to provide paginated results of size 12.  
+The application is using NodeJS/Typescript and React, and has two Search and Product APIs.
 
-* "Showing X of Y":
-  * X = currently displayed items
-  * Y = total records in the data store
+* https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/ - the deployed User Interface
+* https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/products?startKey=<number> - the API for the products
+* https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/products/search?search=<string> - the API for the product search
 
-* "Show More":
-  * When clicked, it should append the next page of results to the existing results.
-  * If record has a “striked-price”, color the price red and cross out the striked-price in grey.
-  * If “striked-price” is null, then color the price black.
-  * The "View Deal" button doesn't do anything for the purpose of this assignment. 
+### Serverless Plugins:
 
-## Backend Requirements:
-* You must write this backend in one of the following languages: Python, JavaScript, Go, or Java.  Use of a framework is encouraged.
-* Create a single REST API endpoint to support the search functionality.
-* This endpoint should support pagination of page size 12 and should also include the total count of matching records for the “Showing X of Y” widget.
-  * The search code should leverage your data store’s filtering/querying mechanism (ilike, scan, etc) on the description & vendor fields.  Pulling all the data and then filtering with code is not allowed.
-  * Create a script that loads the provided JSON facet to load/seed your data store. Download here: Facet File link
+These are the list of plugins in Serverless found in  `serverless.yml` configuration:
+  - serverless-iam-roles-per-function - attached in each serverless function
+  - serverless-webpack - uses Webpack to compile Typescript.
+  - serverless-plugin-scripts - Running custom scripts inside serverless
+  - serverless-dynamodb-local - Running DynamoDB locally when the serverless offline runs 
+  - serverless-offline - Allows running serverless offline, or locally
+  - serverless-s3-deploy - Deploying the Frontend React application in S3.
 
-## Data Store Requirements:
-* You may choose any AWS Service to store your data (RDS, DynamoDB, ElasticSearch, OpenSearch, etc).
-* Running these services in a container or on an EC2 is not allowed.
+## How The Code Is Organized
 
-## Deployment Requirements:
-* You must deploy your solution (Frontend, Backend, and Data Store) to AWS. It’s up to you on which service(s) you want to use - be prepared to explain this choice during the next stage interview.  Note: You may not use Elastic Beanstalk.
-* You must deploy using a template as code framework such as Terraform, CloudFormation, or Serverless.
+Here is the directory structure
+```
+serverless-react-boilerplate/
+│
+├── api/ - Public assets which will retain their original file names and folder structure
+│   ├── ProductModel.ts - Contains the Product functions to call
+│   └── products.ts - The product API functions used where each function represents one Lambda.
+│
+├── public/ - Public assets which will retain their original file names and folder structure
+│   ├── favicon.ico - Favicon
+│   └── manifest.json - Web page manifest
+│
+├── src/
+│   ├── browser/
+│   │   └── ... - Client-side code running in the browser as well as during server-side rendering
+│   ├── components/
+│   │   └── ... - React components
+│   ├── server/
+│   │   └── ... - Server-side code running on AWS Lambda
+│   ├── hooks/
+│   │   └── debounce.js - The debounce hook used in the search to await.
+│   ├── App.tsx - The web application's root component.
+│   └── ... - Other files used by the application
+│
+├── handler.ts - AWS Lambda function handler
+├── serverless.yml - Project configuration. 
+├── babel.config.js - Babel configuration
+├── jest.config.js - Jest configuration
+├── webpack.browser.config.js - Webpack configuration for client-side code
+├── webpack.server.config.js - Webpack configuration for the Lambda backend
+├── products.json - Data to seed the DynamoDB running locally.
+└── ...
+```
 
-## Submission:
-Please provide the following when you are complete with this assignment:
-* URL to deployed solution.
-* GitHub or other VCS link to your source code (Frontend, Backend, Deployment & Template as Code, and any other data loading scripts).
-* Include a write-up of how your application is deployed and any improvements that could be made if it went to production.
+### Changes 
+
+The settings that have been changed from the serverless boiler plate are as follows:
+* Added Lambda functions such as `products` and `productSearch`
+* Environment configuration in serverless for `offline` and `development`
+* Code for the API found in `./api/`
+* Code for the Front end found in `./App.tsx`
+
+## How To Deploy
+
+To deploy the code, you must first make sure that there is an environment set for deployment in the `serverless.yml` file. Then, run the following command:
+
+```bash
+> npm run deploy
+```
