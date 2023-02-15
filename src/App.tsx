@@ -5,6 +5,7 @@ import React, { useEffect, useCallback, useState } from "react";
 import useConfig from "./components/useConfig";
 import { LocalShipping, Redeem } from "@mui/icons-material";
 import { useDebounce } from "./hooks/debounce";
+import { LinearProgress } from "@mui/material";
 
 interface Product {
   id: number
@@ -29,8 +30,13 @@ export default function App() {
   const debouncedSearchTerm = useDebounce(searchTerm, 250);
   const [lastEvaluatedId, setLastEvaluatedId] = useState('');
   const [startId, setStartId] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMoreProducts, setIsLoadingMoreProducts] = useState(false);
 
   const getProducts = useCallback(async (lastId: string) => {
+    if (!lastId) {
+      setIsLoading(true);
+    }
     const apiUrl = config.app.URL;
     fetch(`${apiUrl}/products?startKey=${lastId}`, {
         headers: {
@@ -43,7 +49,6 @@ export default function App() {
         let existingProductsSize = 0;
         setProductTotal(total);
         setProducts((existingProducts: Product[]) => {
-          // TODO: existingProducts.concat(product) if existingProducts.id not in product.id;
           const existingProductIds = existingProducts.map((existingProduct) => existingProduct.id);
           for (const product of products) {
             if (!existingProductIds.includes(product.id)) {
@@ -55,13 +60,19 @@ export default function App() {
         });
         setNumberOfProducts(existingProductsSize);
         setLastEvaluatedId(lastEvaluatedKey.id);
+        setIsLoading(false);
+        setIsLoadingMoreProducts(false);
       })
       .catch((error) => console.error(error));
   }, [setProducts, setNumberOfProducts, setProductTotal]);
 
   useEffect(() => {
     getProducts(startId);
-  }, [getProducts, debouncedSearchTerm]);
+  }, [getProducts, startId]);
+
+  useEffect(() => {
+    console.log('debouncedSearchTerm', debouncedSearchTerm);
+  }, [debouncedSearchTerm])
 
   const displayProduct = () => {
     console.log('Product');
@@ -70,14 +81,9 @@ export default function App() {
   const getMoreProducts = useCallback(() => {
     if (lastEvaluatedId !== startId) {
       setStartId(lastEvaluatedId);
+      setIsLoadingMoreProducts(true);
     }
   }, [setStartId, lastEvaluatedId]);
-
-  useEffect(() => {
-    if (lastEvaluatedId === startId) {
-      getProducts(startId);
-    }
-  }, [lastEvaluatedId, startId])
 
   return (
     <div className="App">
@@ -89,8 +95,12 @@ export default function App() {
         <p>Showing {numberOfProducts} of {productTotal}</p>
       </div>
       <div className="App-products">
-        {products && products.map((product: Product, index: number) => {
-          return (
+        {isLoading && (
+          <div style={{ width: '100%' }}>
+            <LinearProgress />
+          </div>
+        )}
+        {!isLoading && products && products.map((product: Product, index: number) => (
             <div className="product" key={`product-${product.id}`}>
               <div className="image-container">
                 <img src={product.image} width="100" height="100"/>
@@ -113,11 +123,15 @@ export default function App() {
                 <button className="view-deal" onClick={(e) => displayProduct()}>VIEW DEAL</button>
               </div>
             </div>
-          );
-        })}
+        ))}
       </div>
       {numberOfProducts !== productTotal && (
         <div className="load-more">
+          {isLoadingMoreProducts && (
+              <div style={{ width: '100%' }}>
+                <LinearProgress />
+              </div>
+          )}
           <span onClick={(e) => getMoreProducts()}>Show more</span>
         </div>
       )}
