@@ -9,8 +9,8 @@ disabledDeprecations:
 provider:
   name: aws
   runtime: nodejs12.x
-  region: ${opt:region, 'us-east-1'}
   stage: ${opt:stage, 'dev'}
+  region: ${self:custom.env.${self:provider.stage}.region}
   memorySize: 512
   timeout: 6
   logRetentionInDays: 7
@@ -21,9 +21,8 @@ provider:
 
   environment:
     SERVERLESS_PROJECT: ${self:service}
-    SERVERLESS_REGION: ${self:provider.region}
     SERVERLESS_STAGE: ${self:provider.stage}
-
+    SERVERLESS_DYNAMODB: ${self:custom.env.${self:provider.stage}.dynamo_endpoint}
     APP_DIST_URL: ${self:custom.distBucketUrl.${self:provider.region}, self:custom.distBucketUrl.default}
     APP_PUBLIC_URL: ${self:custom.distBucketUrl.${self:provider.region}, self:custom.distBucketUrl.default}
     APIGATEWAY_URL:
@@ -37,6 +36,7 @@ provider:
           - ${self:provider.stage}
 
 plugins:
+  - serverless-iam-roles-per-function
   - serverless-webpack
   - serverless-plugin-scripts
   - serverless-dynamodb-local
@@ -50,19 +50,27 @@ functions:
     events:
       - http:
           path: /
-          method: any
-          cors: true
-      - http:
-          path: /{any+}
-          method: any
+          method: GET
           cors: true
   api:
     handler: api/index.serve
     events:
       - http:
           path: /api/
-          method: any
+          method: GET
           cors: true
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:BatchGetItem
+          - dynamodb:GetItem
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:BatchWriteItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:*:*:table/productsTable
 
 custom:
   distBucketUrl:
@@ -126,6 +134,14 @@ custom:
         sources:
           - table: productsTable
             sources: [./products.json]
+
+  env:
+    dev:
+      region: us-east-1
+      dynamo_endpoint: dynamodb.us-east-1.amazonaws.com
+    default:
+      region: localhost
+      dynamo_endpoint: http://localhost:8080
 
 resources:
   Resources:

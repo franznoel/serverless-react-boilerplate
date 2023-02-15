@@ -65,6 +65,7 @@
     "react-refresh": "^0.10.0",
     "serverless": "^3.14.0",
     "serverless-dynamodb-local": "0.2.40",
+    "serverless-iam-roles-per-function": "3.2.0",
     "serverless-offline": "~8.5.0",
     "serverless-plugin-scripts": "^1.0.2",
     "serverless-s3-deploy": "^0.10.0",
