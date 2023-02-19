@@ -11,8 +11,9 @@ interface Product {
   id: number
   image: string
   title: string
-  brandName: string
+  vendor: string
   price: string
+  ['striked-price']: string
   description: string
   isFreeShipping: boolean
   isFreeGift: boolean
@@ -131,11 +132,11 @@ export default function App() {
                 <img src={product.image} width="100" height="100"/>
               </div>
               <div className="product-summary">
-                <h3 className="brand-name">{product.brandName}</h3>
+                <h3 className="brand-name">{product.vendor}</h3>
                 <p className="title">{product.title}</p>
                 <div className="price-container">
                   <span className="price">{product.price}</span>
-                  <span className="price-before">{product.price}</span>
+                  <span className="price-before">{product['striked-price']}</span>
                 </div>
                 <div className="freebie-container">
                   {product.isFreeShipping && (
