@@ -10,15 +10,16 @@ const {
   DB_PORT,
 } = process.env;
 
-const connectionUrl = `postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
-console.log('connectionUrl', connectionUrl);
+export const knexConfig = {
+  client: 'pg',
+  version: '12',
+  connection: `postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
+};
 
 function getKnexConfig() {
   return {
     development: {
-      client: 'pg',
-      version: '12',
-      connection: connectionUrl,
+      ...knexConfig,
       pool: {
         min: 2,
         max: 10
