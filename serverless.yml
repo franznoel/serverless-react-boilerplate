@@ -84,6 +84,13 @@ functions:
           - dynamodb:Query
           - dynamodb:Scan
         Resource: arn:aws:dynamodb:*:*:table/productsTable
+  sqlProducts:
+    handler: api/sqlProducts.products
+    events:
+      - http:
+          path: /products/sql
+          method: GET
+          cors: true        
 
 custom:
   distBucketUrl:

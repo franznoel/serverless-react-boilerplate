@@ -22,8 +22,18 @@ To contribute as a developer, run the following commands locally
 # Clean Install
 > npm ci
 
-# Install and seed the DynamoDB
-> npm run install:sls-dynamodb
+# Run Docker
+# Optionally, you can remove -d and open a new terminal
+> docker-compose up -d
+
+# Add columns
+> npm run migrate:latest
+
+# Add products
+> npm run seed:run
+
+# Migrate seed
+> npm migrate:latest
 
 # Start development environment
 > npm start
@@ -31,16 +41,18 @@ To contribute as a developer, run the following commands locally
 
 Here are the URLs available:
 * http://localhost:3000/ - the user interface
-* http://localhost:3000/products?startKey= - the API for the products
-* http://localhost:3000/products/search?search= - the API for the product search
+* http://localhost:3000/products?startKey= - the API for the DynamoDB version of products
+* http://localhost:3000/products/search?search= - the API for the DynamoDB version of product search
+* http://localhost:3000/products/sql?search= - the API for the SQL version of Products 
 
 ## Technology Used
 
 The application is using NodeJS/Typescript and React, and has two Search and Product APIs.
 
 * https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/ - the deployed User Interface
-* https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/products?startKey=<number> - the API for the products
-* https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/products/search?search=<string> - the API for the product search
+* https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/products?startKey=<number> - the API for DynamoDB version of products
+* https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/products/search?search=<string> - the API for DynamoDB version of product search
+* https://6gdwn84ulb.execute-api.us-east-1.amazonaws.com/dev/products/sql?search=<string> - the API for SQL version of product search
 
 ### Serverless Plugins:
 
@@ -60,11 +72,15 @@ serverless-react-boilerplate/
 │
 ├── api/ - Public assets which will retain their original file names and folder structure
 │   ├── ProductModel.ts - Contains the Product functions to call
-│   └── products.ts - The product API functions used where each function represents one Lambda.
+│   └── products.ts - The product API functions used where each function represents one Lambda using DynamoDB.
+│   └── sqlProducts.ts - The product API functions used where each function represents one Lambda using SQL.
 │
 ├── public/ - Public assets which will retain their original file names and folder structure
 │   ├── favicon.ico - Favicon
 │   └── manifest.json - Web page manifest
+│
+├── migrations/ - Migration files
+│   └── 20230221032202_product_table - Create/Drop a table namd product
 │
 ├── src/
 │   ├── browser/
@@ -81,7 +97,9 @@ serverless-react-boilerplate/
 ├── handler.ts - AWS Lambda function handler
 ├── serverless.yml - Project configuration. 
 ├── babel.config.js - Babel configuration
+├── docker-compose.yml - Run the PgSQL image.
 ├── jest.config.js - Jest configuration
+├── knexfile.ts - Knex configuration
 ├── webpack.browser.config.js - Webpack configuration for client-side code
 ├── webpack.server.config.js - Webpack configuration for the Lambda backend
 ├── products.json - Data to seed the DynamoDB running locally.
@@ -92,7 +110,8 @@ serverless-react-boilerplate/
 
 The settings that have been changed from the serverless boiler plate are as follows:
 * Added Lambda functions such as `products` and `productSearch`
-* Environment configuration in serverless for `offline` and `development`
+* Environment configuration in serverless for `development` and `production`
+* Environment configuration in serverless for `IS_OFFLINE`
 * Code for the API found in `./api/`
 * Code for the Front end found in `./App.tsx`
 
