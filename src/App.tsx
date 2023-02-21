@@ -133,7 +133,7 @@ export default function App() {
               </div>
               <div className="product-summary">
                 <h3 className="brand-name">{product.vendor}</h3>
-                <p className="title">{product.title}</p>
+                <p className="title">{product.title.slice(0, 100)}...</p>
                 <div className="price-container">
                   <span className="price">{product.price}</span>
                   <span className="price-before">{product['striked-price']}</span>
