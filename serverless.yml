@@ -52,6 +52,13 @@ functions:
           path: /
           method: GET
           cors: true
+  serveSql:
+    handler: handlerSql.serve
+    events:
+      - http:
+          path: /sql
+          method: GET
+          cors: true
   products:
     handler: api/products.serve
     events:

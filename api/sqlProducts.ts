@@ -21,7 +21,7 @@ export const products = async (event: APIGatewayEvent, _context: Context): Promi
         products: products || [],
         limit: limit || 0,
         offset: offset || 0,
-        total: totalProducts || 0,
+        total: Number(totalProducts) || 0,
       }),
     };
   } catch(error) {

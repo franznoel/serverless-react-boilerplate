@@ -1,6 +1,7 @@
 const path = require("path");
 const slsw = require("serverless-webpack");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
+const { IgnorePlugin } = require("webpack");
 
 module.exports = {
   entry: slsw.lib.entries,
@@ -19,6 +20,22 @@ module.exports = {
     hints: false,
   },
   devtool: "nosources-source-map",
+  externals: {
+    // Possible drivers for knex - we'll ignore them
+    'sqlite3': 'sqlite3',
+    'mariasql': 'mariasql',
+    'mssql': 'mssql',
+    'mysql': 'mysql',
+    'mysql2': 'mysql2',
+    'oracle': 'oracle',
+    'strong-oracle': 'strong-oracle',
+    'oracledb': 'oracledb',
+    'pg-native': 'pg-native',
+    'pg-query-stream': 'pg-query-stream',
+    'tap': 'tap',
+    'tedious': 'tedious',
+    'better-sqlite3': 'better-sqlite3',
+  },
   module: {
     rules: [
       {
